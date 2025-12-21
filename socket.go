@@ -32,14 +32,28 @@ func handleRoomSocket(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user = &internal.User{Id: int(clientId), Conn: conn}
+
+	var message internal.Message
+	err = conn.ReadJSON(&message)
+	if err != nil {
+		logger.Printf("Read error: %v", err)
+		return
+	}
+	if payload, ok := message.Payload.(internal.IntroduceMessage); ok {
+		user.Name = payload.UserName
+	} else {
+		conn.Close()
+		return
+	}
+
 	room.Join(user)
 
 	for {
 		var message internal.Message
 		err := conn.ReadJSON(&message)
 		if err != nil {
-			logger.Println("Read error:", err)
-			break
+			logger.Printf("Read error: %v", err)
+			return
 		}
 		switch payload := message.Payload.(type) {
 		case internal.PlayMessage:

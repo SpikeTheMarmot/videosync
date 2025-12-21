@@ -108,13 +108,24 @@ func (room *Room) Join(user *User) {
 
 func (room *Room) handleJoin(user *User) {
 	room.users = append(room.users, user)
+	users := make([]string, len(room.users))
+
+	for i, user := range room.users {
+		users[i] = user.Name
+	}
+
 	user.Conn.WriteJSON(Message{
 		Type: Init,
 		Payload: InitMessage{
 			VideoId:       room.playback.VideoId,
 			VideoPos:      room.playback.Position(),
 			PlaybackState: int(room.playback.State),
+			Users:         users,
 		},
+	})
+	room.Send(user, Message{
+		Type:    Join,
+		Payload: JoinMessage{UserName: user.Name},
 	})
 	room.logger.Printf("Client #%d joined\n", user.Id)
 }
@@ -134,6 +145,10 @@ func (room *Room) handleLeave(user *User) {
 	if len(room.users) == 0 {
 		room.close()
 	}
+	room.Send(user, Message{
+		Type:    Leave,
+		Payload: LeaveMessage{UserName: user.Name},
+	})
 	room.logger.Printf("Client #%d left\n", user.Id)
 }
 

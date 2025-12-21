@@ -3,13 +3,24 @@ let player;
 let ws;
 let serverState = { state: null, position: null };
 let syncing = false;
+let roomId;
+/** @type HTMLElement */
+let userlist;
 
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("video_url_input");
     const button = document.getElementById("play_video_button");
+    const usernameInput = document.getElementById("username_input");
+    const usernameButton = document.getElementById("submit_username_button");
+    const usernameModal = document.getElementById("username_modal");
+    userlist = document.getElementById("userlist");
+
     if (
         !(input instanceof HTMLInputElement) ||
-        !(button instanceof HTMLButtonElement)
+        !(button instanceof HTMLButtonElement) ||
+        !(usernameInput instanceof HTMLInputElement) ||
+        !(usernameButton instanceof HTMLButtonElement) ||
+        !(usernameModal instanceof HTMLElement)
     ) {
         return;
     }
@@ -22,6 +33,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     button.addEventListener("click", () => {
         playVideo(input.value);
+    });
+
+    const cachedUsername = localStorage.getItem("username");
+    if (cachedUsername) {
+        usernameModal.style.display = "none";
+        initRoom(cachedUsername);
+        return;
+    }
+
+    const submitUsername = (userName) => {
+        const username = usernameInput.value.trim();
+        if (username === "") {
+            return;
+        }
+
+        localStorage.setItem("username", username);
+        usernameModal.style.display = "none";
+        initRoom(username);
+    };
+
+    usernameButton.addEventListener("click", () => {
+        submitUsername(usernameInput.value);
+    });
+
+    usernameInput.addEventListener("keypress", (event) => {
+        if (event.code === "Enter") {
+            submitUsername(usernameInput.value);
+        }
     });
 });
 
@@ -39,8 +78,8 @@ function playVideo(url) {
 function createPlayer(events) {
     return new Promise((resolve) => {
         const player = new YT.Player("yt_player", {
-            width: 640,
-            height: 360,
+            width: 1280,
+            height: 720,
             events: {},
             events: {
                 ...events,
@@ -77,7 +116,8 @@ function updatePlayerState(newState) {
     player.seekTo(newState.position);
 }
 
-async function initRoom(roomId) {
+async function initRoom(userName) {
+    await youtubeApiPromise;
     player = await createPlayer({
         onStateChange: (event) => {
             if (syncing) {
@@ -126,6 +166,17 @@ async function initRoom(roomId) {
 
     ws = connectSocket(roomId);
 
+    ws.addEventListener("open", () => {
+        ws.send(
+            JSON.stringify({
+                type: "introduce",
+                payload: {
+                    username: userName,
+                },
+            })
+        );
+    });
+
     ws.addEventListener("message", (event) => {
         const { type, payload } = JSON.parse(event.data);
         switch (type) {
@@ -138,6 +189,7 @@ async function initRoom(roomId) {
                     state: payload.playbackState,
                     position: payload.videoPos,
                 };
+                initUserlist(payload.users);
                 break;
             case "play":
                 updatePlayerState({
@@ -157,6 +209,13 @@ async function initRoom(roomId) {
                     state: YT.PlayerState.PAUSED,
                     position: 0,
                 });
+                break;
+            case "join":
+                addUserNode(payload.userName);
+                break;
+            case "leave":
+                removeUserNode(payload.userName);
+                break;
         }
     });
 
@@ -187,4 +246,28 @@ async function initRoom(roomId) {
             prevTime = -1;
         }
     }, 500);
+}
+
+function addUserNode(userName) {
+    const el = document.createElement("div");
+    el.innerText = userName;
+    el.classList.add("userlist_item");
+    userlist.appendChild(el);
+}
+
+function removeUserNode(userName) {
+    for (const el of userlist.children) {
+        if (el.innerText === userName) {
+            userlist.removeChild(el);
+            break;
+        }
+    }
+}
+
+function initUserlist(users) {
+    userlist.innerHTML = "";
+
+    for (const user of users) {
+        addUserNode(user);
+    }
 }

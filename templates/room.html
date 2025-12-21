@@ -8,25 +8,58 @@
         <script src="https://www.youtube.com/player_api"></script>
         <script src="/static/room.js"></script>
         <script>
-            function onYouTubePlayerAPIReady() {
-                initRoom('{{.Id}}');
-            }
+            const youtubeApiPromise = new Promise((resolve, _reject) => {
+                window.onYouTubePlayerAPIReady = () => {
+                    roomId = "{{.Id}}";
+                    resolve();
+                };
+            });
         </script>
     </head>
 
     <body class="dark">
         <h1>{{.Id}}</h1>
 
-        <div id="yt_player"></div>
+        <div
+            style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            "
+        >
+            <div style="flex: 1 1 0">
+                <div id="yt_player"></div>
 
-        <div>
-            <input
-                id="video_url_input"
-                type="text"
-                placeholder="Paste YouTube URL"
-                style="width: 30em"
-            />
-            <button id="play_video_button" type="submit">Play video</button>
+                <div>
+                    <input
+                        id="video_url_input"
+                        type="text"
+                        placeholder="Paste YouTube URL"
+                        style="width: 30em"
+                    />
+                    <button id="play_video_button" type="submit">
+                        Play video
+                    </button>
+                </div>
+            </div>
+            <div style="flex: 0 0 20em">
+                <h2>Users</h2>
+                <div id="userlist"></div>
+            </div>
+        </div>
+
+        <div id="username_modal" class="modal_background">
+            <div class="modal_window">
+                <input
+                    id="username_input"
+                    type="text"
+                    placeholder="Pick a username"
+                    autofocus
+                />
+                <button id="submit_username_button" type="submit">
+                    Start watching
+                </button>
+            </div>
         </div>
     </body>
 </html>

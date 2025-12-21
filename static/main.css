@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-@import url('dark.css');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+@import url("dark.css");
 
 body {
     background-color: var(--md-sys-color-surface);
     color: var(--md-sys-color-on-surface);
     font-size: 125%;
+    font-family: "Open Sans", sans-serif;
 }
 
 #chat_output {
@@ -12,7 +13,7 @@ body {
     overflow: scroll;
 }
 
-input[type='text'] {
+input[type="text"] {
     font-size: 1em;
     background-color: var(--md-sys-color-surface);
     color: var(--md-sys-color-on-surface);
@@ -28,7 +29,7 @@ input[type='text'] {
 button {
     font-size: 1em;
 
-    &[type='submit'] {
+    &[type="submit"] {
         background-color: var(--md-sys-color-primary-container);
         color: var(--md-sys-color-on-primary-container);
         border: none;
@@ -43,4 +44,23 @@ button {
             );
         }
     }
+}
+
+.modal_background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal_window {
+    padding: 1em;
+    background-color: var(--md-sys-color-surface);
+    border-radius: 0.3em;
 }
