@@ -52,14 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const submitUsername = (userName) => {
-        const username = usernameInput.value.trim();
-        if (username === "") {
+        const sanitizedUserName = userName.trim().substring(0, 25);
+        if (sanitizedUserName === "") {
             return;
         }
 
-        localStorage.setItem("username", username);
+        localStorage.setItem("username", sanitizedUserName);
         usernameModal.style.display = "none";
-        initRoom(username);
+        initRoom(sanitizedUserName);
     };
 
     usernameButton.addEventListener("click", () => {
@@ -197,7 +197,7 @@ async function initRoom(userName) {
             JSON.stringify({
                 type: "introduce",
                 payload: {
-                    username: userName,
+                    username: userName.trim().substring(0, 25),
                 },
             })
         );
