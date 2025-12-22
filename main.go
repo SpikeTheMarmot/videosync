@@ -56,9 +56,16 @@ func renderTemplate(w io.Writer, name string, data any) error {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("error loading .env file: %v", err)
+	if _, err := os.Stat(".env"); err == nil {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("error loading .env file: %v", err)
+		}
+	}
+
+	if os.Getenv("YOUTUBE_API_KEY") == "" {
+		log.Println("environment variable YOUTUBE_API_KEY is not set")
+		return
 	}
 
 	flag.Parse()
