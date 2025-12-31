@@ -11,7 +11,8 @@ let queuewrapper;
 
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("video_url_input");
-    const button = document.getElementById("play_video_button");
+    const queueButton = document.getElementById("add_to_queue_button");
+    const skipButton = document.getElementById("skip_button");
     const usernameInput = document.getElementById("username_input");
     const usernameButton = document.getElementById("submit_username_button");
     const usernameModal = document.getElementById("username_modal");
@@ -21,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (
         !(input instanceof HTMLInputElement) ||
-        !(button instanceof HTMLButtonElement) ||
+        !(queueButton instanceof HTMLButtonElement) ||
+        !(skipButton instanceof HTMLButtonElement) ||
         !(usernameInput instanceof HTMLInputElement) ||
         !(usernameButton instanceof HTMLButtonElement) ||
         !(usernameModal instanceof HTMLElement) ||
@@ -37,9 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    button.addEventListener("click", () => {
+    queueButton.addEventListener("click", () => {
         queueVideo(input.value);
         input.value = "";
+    });
+
+    skipButton.addEventListener("click", () => {
+        skipVideo();
     });
 
     window.addEventListener("resize", () => {
@@ -87,6 +93,12 @@ function queueVideo(url) {
             },
         })
     );
+}
+
+function skipVideo() {
+    ws.send(JSON.stringify({
+        type: "skip",
+    }));
 }
 
 function createPlayer(width, height, events) {

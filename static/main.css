@@ -28,13 +28,24 @@ input[type="text"] {
 
 button {
     font-size: 1em;
+    border: none;
+    border-radius: 0.3em;
+    padding: 0.5em;
+
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+
+    &:hover {
+        background-color: color-mix(
+            in srgb,
+            var(--md-sys-color-secondary-container),
+            var(--md-sys-color-on-secondary-container) 10%
+        );
+    }
 
     &[type="submit"] {
         background-color: var(--md-sys-color-primary-container);
         color: var(--md-sys-color-on-primary-container);
-        border: none;
-        border-radius: 0.3em;
-        padding: 0.5em;
 
         &:hover {
             background-color: color-mix(

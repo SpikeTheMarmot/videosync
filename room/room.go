@@ -126,7 +126,10 @@ func (room *Room) AddToQueue(videoId string) {
 
 func (room *Room) LoadNext() {
 	if len(room.queue) == 0 {
-		room.playback = Playback{}
+		if room.playback.Video.Id != "" {
+			room.playback = Playback{}
+			room.Send(nil, message.Message{Type: message.Load, Payload: message.LoadMessage{VideoId: ""}})
+		}
 		return
 	}
 	video := room.queue[0]

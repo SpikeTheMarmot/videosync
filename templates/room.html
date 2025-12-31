@@ -39,11 +39,14 @@
                         placeholder="Paste YouTube URL"
                         style="width: 30em"
                     />
-                    <button id="play_video_button" type="submit">
+                    <button id="add_to_queue_button" type="submit">
                         Add to queue
                     </button>
                 </div>
-                <h2>Next up</h2>
+                <div style="display: flex; flex-direction: row; justify-content: start; align-items: baseline;">
+                    <h2>Next up</h2>
+                    <button id="skip_button" style="margin-left: 2em">Skip current video</button>
+                </div>
                 <div id="queuewrapper">The video queue is empty.</div>
             </div>
             <div style="flex: 0 0 12em; margin-left: 2em; overflow: hidden">

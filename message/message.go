@@ -18,6 +18,7 @@ const (
 	Join      MessageType = "join"
 	Leave     MessageType = "leave"
 	SyncQueue MessageType = "syncqueue"
+	SkipVideo MessageType = "skip"
 )
 
 type Message struct {
@@ -64,6 +65,8 @@ type LeaveMessage struct {
 type SyncQueueMessage struct {
 	Queue []media.Video `json:"queue"`
 }
+
+type SkipVideoMessage struct{}
 
 func (m *Message) UnmarshalJSON(data []byte) error {
 	var temp struct {
@@ -114,6 +117,8 @@ func (m *Message) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		m.Payload = payload
+	case SkipVideo:
+		m.Payload = SkipVideoMessage{}
 	default:
 		return fmt.Errorf("unknown message type: %s", temp.Type)
 	}

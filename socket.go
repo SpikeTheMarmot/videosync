@@ -64,6 +64,8 @@ func handleRoomSocket(w http.ResponseWriter, r *http.Request) {
 			if videoId, ok := youtube.ParseUrl(payload.Url); ok {
 				room.AddToQueue(videoId)
 			}
+		case msg.SkipVideoMessage:
+			room.LoadNext()
 		default:
 			room.Kick(user)
 		}
