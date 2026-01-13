@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"flag"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -21,8 +22,7 @@ var staticFiles embed.FS
 var templatesFiles embed.FS
 
 var isDev = flag.Bool("dev", false, "use static files from filesystem")
-
-const listenAddress = "0.0.0.0:8080"
+var listenPort = flag.Int("port", 8080, "port to listen to")
 
 var upgrader = websocket.Upgrader{}
 
@@ -74,12 +74,19 @@ func main() {
 	} else {
 		staticHandler = http.FileServer(http.FS(staticFiles))
 	}
+	if *listenPort < 1 || *listenPort > 65535 {
+		log.Fatal("port number must be between 1 and 65535")
+	}
+	listenAddress := fmt.Sprintf("0.0.0.0:%d", *listenPort)
 	http.HandleFunc("GET /socket/{room_id}", handleRoomSocket)
 	http.HandleFunc("GET /room/{room_id}", handleRoom)
 	http.Handle("/static/", staticHandler)
 	http.HandleFunc("/", handleHome)
 	log.Printf("Listening on http://%s\n", listenAddress)
-	http.ListenAndServe(listenAddress, nil)
+	err := http.ListenAndServe(listenAddress, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
