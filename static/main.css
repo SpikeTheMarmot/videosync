@@ -41,12 +41,12 @@ button {
 
     &[type="submit"] {
         background-color: var(--color-accent);
-        color: var(--color-crust);
+        color: var(--color-base);
 
         &:hover {
             background-color: color-mix(in srgb,
                     var(--color-accent),
-                    var(--color-crust) 10%);
+                    var(--color-base) 10%);
         }
     }
 }
@@ -72,12 +72,12 @@ button {
 
 #userlist {
     padding: 1em;
-    background-color: var(--color-mantle);
+    background-color: var(--color-bg-1);
     border-radius: 0.5em;
 }
 
 #queuewrapper {
     padding: 1em;
-    background-color: var(--color-mantle);
+    background-color: var(--color-bg-1);
     border-radius: 0.5em;
 }

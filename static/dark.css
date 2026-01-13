@@ -25,5 +25,8 @@
   --color-base: #1e1e2e;
   --color-mantle: #181825;
   --color-crust: #11111b;
+
   --color-accent: var(--color-blue);
+  --color-bg-1: var(--color-mantle);
+  --color-bg-0: var(--color-crust);
 }
