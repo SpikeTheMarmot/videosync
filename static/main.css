@@ -2,8 +2,8 @@
 @import url("dark.css");
 
 body {
-    background-color: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
+    background-color: var(--color-base);
+    color: var(--color-text);
     font-size: 125%;
     font-family: "Open Sans", sans-serif;
 }
@@ -15,44 +15,38 @@ body {
 
 input[type="text"] {
     font-size: 1em;
-    background-color: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
-    border: 1px solid var(--md-sys-color-outline);
-    border-radius: 0.3em;
+    background-color: var(--color-base);
+    color: var(--color-text);
+    border: 1px solid var(--color-overlay-0);
+    border-radius: 0.5em;
     padding: 0.5em;
 
     &:focus {
-        outline: var(--md-sys-color-primary) solid 2px;
+        outline: var(--color-accent) solid 2px;
     }
 }
 
 button {
     font-size: 1em;
     border: none;
-    border-radius: 0.3em;
+    border-radius: 0.5em;
     padding: 0.5em;
 
-    background-color: var(--md-sys-color-secondary-container);
-    color: var(--md-sys-color-on-secondary-container);
+    background-color: var(--color-surface-1);
+    color: var(--color-text);
 
     &:hover {
-        background-color: color-mix(
-            in srgb,
-            var(--md-sys-color-secondary-container),
-            var(--md-sys-color-on-secondary-container) 10%
-        );
+        background-color: color-mix(in srgb, var(--color-surface-1), var(--color-text) 10%);
     }
 
     &[type="submit"] {
-        background-color: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container);
+        background-color: var(--color-accent);
+        color: var(--color-base);
 
         &:hover {
-            background-color: color-mix(
-                in srgb,
-                var(--md-sys-color-primary-container),
-                var(--md-sys-color-on-primary-container) 10%
-            );
+            background-color: color-mix(in srgb,
+                    var(--color-accent),
+                    var(--color-base) 10%);
         }
     }
 }
@@ -63,7 +57,7 @@ button {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -72,6 +66,18 @@ button {
 
 .modal_window {
     padding: 1em;
-    background-color: var(--md-sys-color-surface);
-    border-radius: 0.3em;
+    background-color: var(--color-base);
+    border-radius: 0.5em;
+}
+
+#userlist {
+    padding: 1em;
+    background-color: var(--color-bg-1);
+    border-radius: 0.5em;
+}
+
+#queuewrapper {
+    padding: 1em;
+    background-color: var(--color-bg-1);
+    border-radius: 0.5em;
 }
