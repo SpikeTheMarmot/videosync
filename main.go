@@ -64,8 +64,7 @@ func main() {
 	}
 
 	if os.Getenv("YOUTUBE_API_KEY") == "" {
-		log.Println("environment variable YOUTUBE_API_KEY is not set")
-		return
+		log.Println("WARNING: environment variable YOUTUBE_API_KEY is not set. API calls will fail.")
 	}
 
 	flag.Parse()
