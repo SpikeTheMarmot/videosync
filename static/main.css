@@ -51,6 +51,17 @@ button {
     }
 }
 
+.queue-video {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+button:disabled {
+    color: var(--color-overlay-0);
+    background-color: var(--color-base);
+}
+
 .modal_background {
     position: absolute;
     top: 0;

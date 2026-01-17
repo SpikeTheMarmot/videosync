@@ -95,6 +95,13 @@ function queueVideo(url) {
     );
 }
 
+function reorderQueue(from, to) {
+    ws.send(JSON.stringify({
+        type: "reorderqueue",
+        payload: { from, to }
+    }));
+}
+
 function skipVideo() {
     ws.send(JSON.stringify({
         type: "skip",
@@ -106,7 +113,6 @@ function createPlayer(width, height, events) {
         const player = new YT.Player("yt_player", {
             width: width,
             height: height,
-            events: {},
             events: {
                 ...events,
                 onReady: () => {
@@ -291,9 +297,6 @@ async function initRoom(userName) {
                     })
                 );
             }
-            prevTime = currentTime;
-        } else {
-            prevTime = -1;
         }
     }, 500);
 }
@@ -308,7 +311,7 @@ function addUserNode(userName) {
 function removeUserNode(userName) {
     for (const el of userlist.children) {
         if (el.innerText === userName) {
-            userlist.removeChild(el);
+            el.remove();
             break;
         }
     }
@@ -328,22 +331,62 @@ function updateQueue(queue) {
         queuewrapper.innerText = "The video queue is empty.";
     }
 
-    for (const video of queue) {
+    for (let i = 0; i < queue.length; i++) {
+        const video = queue[i];
+
+        const videoInfo = document.createElement("div");
         const title = document.createElement("span");
         title.classList.add("video_title");
         title.innerText = video.title;
-
         const duration = document.createElement("span");
         duration.classList.add("video_duration");
         duration.innerText = "(" + formatNanoseconds(video.duration) + ")";
+        videoInfo.appendChild(title);
+        videoInfo.appendChild(duration);
 
         const el = document.createElement("div");
         el.classList.add("queue-video");
-        el.appendChild(title);
-        el.appendChild(duration);
+        el.appendChild(videoInfo);
+        addQueueOrderControls(el, queue.length, i);
 
         queuewrapper.appendChild(el);
     }
+}
+
+function addQueueOrderControls(parent, queueLength, i) {
+    const controls = document.createElement("span");
+    controls.classList.add("queue-controls");
+
+    const toTop = document.createElement("button");
+    toTop.innerText = "⇈";
+    toTop.title = "Move to top";
+    toTop.disabled = (i === 0);
+    toTop.addEventListener("click", () => reorderQueue(i, 0));
+
+    const up = document.createElement("button");
+    up.innerText = "↑";
+    up.title = "Move up";
+    up.disabled = (i === 0);
+    up.addEventListener("click", () => reorderQueue(i, i - 1));
+
+    const down = document.createElement("button");
+    down.innerText = "↓";
+    down.title = "Move down";
+    down.disabled = (i === queueLength - 1);
+    down.addEventListener("click", () => reorderQueue(i, i + 1));
+
+    const toBottom = document.createElement("button");
+    toBottom.innerText = "⇊";
+    toBottom.title = "Move to bottom";
+    toBottom.disabled = (i === queueLength - 1);
+    toBottom.addEventListener("click", () => reorderQueue(i, queueLength - 1));
+
+    controls.appendChild(toTop)
+    controls.appendChild(up);
+    controls.appendChild(down);
+    controls.appendChild(toBottom)
+
+    parent.appendChild(controls);
 }
 
 function formatNanoseconds(ns) {

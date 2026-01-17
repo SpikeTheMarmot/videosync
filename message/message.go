@@ -9,16 +9,17 @@ import (
 type MessageType string
 
 const (
-	Init      MessageType = "init"
-	Play      MessageType = "play"
-	Pause     MessageType = "pause"
-	Load      MessageType = "load"
-	QueueUrl  MessageType = "queueurl"
-	Introduce MessageType = "introduce"
-	Join      MessageType = "join"
-	Leave     MessageType = "leave"
-	SyncQueue MessageType = "syncqueue"
-	SkipVideo MessageType = "skip"
+	Init         MessageType = "init"
+	Play         MessageType = "play"
+	Pause        MessageType = "pause"
+	Load         MessageType = "load"
+	QueueUrl     MessageType = "queueurl"
+	Introduce    MessageType = "introduce"
+	Join         MessageType = "join"
+	Leave        MessageType = "leave"
+	SyncQueue    MessageType = "syncqueue"
+	SkipVideo    MessageType = "skip"
+	ReorderQueue MessageType = "reorderqueue"
 )
 
 type Message struct {
@@ -67,6 +68,11 @@ type SyncQueueMessage struct {
 }
 
 type SkipVideoMessage struct{}
+
+type ReorderQueueMessage struct {
+	From int `json:"from"`
+	To   int `json:"to"`
+}
 
 func (m *Message) UnmarshalJSON(data []byte) error {
 	var temp struct {
@@ -119,6 +125,12 @@ func (m *Message) UnmarshalJSON(data []byte) error {
 		m.Payload = payload
 	case SkipVideo:
 		m.Payload = SkipVideoMessage{}
+	case ReorderQueue:
+		var payload ReorderQueueMessage
+		if err := json.Unmarshal(temp.Payload, &payload); err != nil {
+			return err
+		}
+		m.Payload = payload
 	default:
 		return fmt.Errorf("unknown message type: %s", temp.Type)
 	}

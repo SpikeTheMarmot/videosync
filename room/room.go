@@ -152,6 +152,23 @@ func (room *Room) Send(from *User, message message.Message) {
 	}
 }
 
+func (room *Room) ReorderQueue(from, to int) {
+	if from < 0 || from >= len(room.queue) || to < 0 || to > len(room.queue) || from == to {
+		return
+	}
+
+	item := room.queue[from]
+	room.queue = append(room.queue[:from], room.queue[from+1:]...)
+
+	if to >= len(room.queue) {
+		room.queue = append(room.queue, item)
+	} else {
+		room.queue = append(room.queue[:to], append([]media.Video{item}, room.queue[to:]...)...)
+	}
+
+	room.Send(nil, message.Message{Type: message.SyncQueue, Payload: message.SyncQueueMessage{Queue: room.queue}})
+}
+
 func (room *Room) Lock() {
 	room.mu.Lock()
 }
