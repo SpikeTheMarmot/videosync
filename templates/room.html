@@ -6,15 +6,7 @@
         <title>Videosync</title>
         <link rel="stylesheet" href="/static/main.css" />
         <script src="https://www.youtube.com/player_api"></script>
-        <script src="/static/room.js"></script>
-        <script>
-            const youtubeApiPromise = new Promise((resolve, _reject) => {
-                window.onYouTubePlayerAPIReady = () => {
-                    roomId = "{{.Id}}";
-                    resolve();
-                };
-            });
-        </script>
+        <script type="module" src="/static/room.js"></script>
     </head>
 
     <body class="dark">

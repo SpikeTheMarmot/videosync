@@ -1,15 +1,40 @@
+const roomId = getRoomId();
+
 let player;
 /** @type WebSocket */
 let ws;
 let serverState = { state: null, position: null };
 let syncing = false;
-let roomId;
 /** @type HTMLElement */
 let userlist;
 /** @type HTMLElement */
 let queuewrapper;
 
-document.addEventListener("DOMContentLoaded", () => {
+const youtubeApiPromise = new Promise((resolve, _reject) => {
+    window.onYouTubePlayerAPIReady = () => {
+        resolve();
+    };
+});
+
+const pageReadyPromise = new Promise((resolve) => {
+    if (
+        document.readyState === "complete" ||
+        document.readyState === "loaded"
+    ) {
+        resolve();
+        return;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        resolve();
+    });
+});
+
+init();
+
+async function init() {
+    await pageReadyPromise;
+
     const input = document.getElementById("video_url_input");
     const queueButton = document.getElementById("add_to_queue_button");
     const skipButton = document.getElementById("skip_button");
@@ -58,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cachedUsername = localStorage.getItem("username");
     if (cachedUsername) {
         usernameModal.style.display = "none";
-        initRoom(cachedUsername);
+        initPlayer(cachedUsername);
         return;
     }
 
@@ -70,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem("username", sanitizedUserName);
         usernameModal.style.display = "none";
-        initRoom(sanitizedUserName);
+        initPlayer(sanitizedUserName);
     };
 
     usernameButton.addEventListener("click", () => {
@@ -82,99 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
             submitUsername(usernameInput.value);
         }
     });
-});
-
-function queueVideo(url) {
-    ws.send(
-        JSON.stringify({
-            type: "queueurl",
-            payload: {
-                url,
-            },
-        })
-    );
 }
 
-function reorderQueue(from, to) {
-    ws.send(JSON.stringify({
-        type: "reorderqueue",
-        payload: { from, to }
-    }));
-}
+async function initPlayer(userName) {
+    await youtubeApiPromise;
 
-function removeFromQueue(index) {
-    ws.send(JSON.stringify({
-        type: "removefromqueue",
-        payload: { index }
-    }));
-}
-
-function skipVideo() {
-    ws.send(JSON.stringify({
-        type: "skip",
-    }));
-}
-
-function createPlayer(width, height, events) {
-    return new Promise((resolve) => {
-        const player = new YT.Player("yt_player", {
-            width: width,
-            height: height,
-            events: {
-                ...events,
-                onReady: () => {
-                    resolve(player);
-                },
-            },
-        });
-    });
-}
-
-function connectSocket(roomId) {
-    const proto = document.location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${proto}://${document.location.host}/socket/${roomId}`);
-    return ws;
-}
-
-function updatePlayerState(newState) {
-    serverState = { ...newState };
-
-    syncing = true;
-    setTimeout(() => {
-        syncing = false;
-    }, 250);
-
-    switch (newState.state) {
-        case YT.PlayerState.PLAYING:
-            player.playVideo();
-            break;
-        case YT.PlayerState.PAUSED:
-            player.pauseVideo();
-            break;
-    }
-
-    player.seekTo(newState.position);
-}
-
-/**
- * @return {{width: number; height: number;}}
- */
-function calculatePlayerSize() {
-    const playerWrapper = document.getElementById("player_wrapper");
-    let width = playerWrapper.clientWidth;
-    let height = width / (16 / 9);
-    if (height > window.innerHeight * 0.75) {
-        height = window.innerHeight * 0.75;
-        width = height * (16 / 9);
-    }
-    console.log({ width, height });
-    return { width, height };
-}
-
-async function initRoom(userName) {
     const { width: playerWidth, height: playerHeight } = calculatePlayerSize();
 
-    await youtubeApiPromise;
     player = await createPlayer(playerWidth, playerHeight, {
         onStateChange: (event) => {
             if (syncing) {
@@ -192,15 +131,12 @@ async function initRoom(userName) {
                                 payload: {
                                     position: player.getCurrentTime(),
                                 },
-                            })
+                            }),
                         );
                     }
                     break;
                 case YT.PlayerState.PAUSED:
                     if (serverState.state !== YT.PlayerState.PAUSED) {
-                        console.log(
-                            `Sending pause because serverState.state is ${serverState.state}`
-                        );
                         serverState.state = YT.PlayerState.PAUSED;
                         serverState.position = player.getCurrentTime();
                         ws.send(
@@ -209,16 +145,12 @@ async function initRoom(userName) {
                                 payload: {
                                     position: player.getCurrentTime(),
                                 },
-                            })
+                            }),
                         );
                     }
                     break;
             }
         },
-    });
-
-    player.addEventListener("onPlaying", () => {
-        console.log("playing");
     });
 
     ws = connectSocket(roomId);
@@ -230,7 +162,7 @@ async function initRoom(userName) {
                 payload: {
                     username: userName.trim().substring(0, 25),
                 },
-            })
+            }),
         );
     });
 
@@ -301,11 +233,114 @@ async function initRoom(userName) {
                         payload: {
                             position: currentTime,
                         },
-                    })
+                    }),
                 );
             }
         }
     }, 500);
+}
+
+function getRoomId() {
+    const re = /^\/room\/([a-z0-9-]+)$/;
+    const match = location.pathname.match(re);
+    if (match === null) {
+        throw new Error(`Invalid path ${location.pathname}`);
+    }
+    return match[1];
+}
+
+function queueVideo(url) {
+    ws.send(
+        JSON.stringify({
+            type: "queueurl",
+            payload: {
+                url,
+            },
+        }),
+    );
+}
+
+function reorderQueue(from, to) {
+    ws.send(
+        JSON.stringify({
+            type: "reorderqueue",
+            payload: { from, to },
+        }),
+    );
+}
+
+function removeFromQueue(index) {
+    ws.send(
+        JSON.stringify({
+            type: "removefromqueue",
+            payload: { index },
+        }),
+    );
+}
+
+function skipVideo() {
+    ws.send(
+        JSON.stringify({
+            type: "skip",
+        }),
+    );
+}
+
+function createPlayer(width, height, events) {
+    return new Promise((resolve) => {
+        const player = new YT.Player("yt_player", {
+            width: width,
+            height: height,
+            events: {
+                ...events,
+                onReady: () => {
+                    resolve(player);
+                },
+            },
+        });
+    });
+}
+
+function connectSocket() {
+    const proto = document.location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(
+        `${proto}://${document.location.host}/socket/${roomId}`,
+    );
+    return ws;
+}
+
+function updatePlayerState(newState) {
+    serverState = { ...newState };
+
+    syncing = true;
+    setTimeout(() => {
+        syncing = false;
+    }, 250);
+
+    switch (newState.state) {
+        case YT.PlayerState.PLAYING:
+            player.playVideo();
+            break;
+        case YT.PlayerState.PAUSED:
+            player.pauseVideo();
+            break;
+    }
+
+    player.seekTo(newState.position);
+}
+
+/**
+ * @return {{width: number; height: number;}}
+ */
+function calculatePlayerSize() {
+    const playerWrapper = document.getElementById("player_wrapper");
+    let width = playerWrapper.clientWidth;
+    let height = width / (16 / 9);
+    if (height > window.innerHeight * 0.75) {
+        height = window.innerHeight * 0.75;
+        width = height * (16 / 9);
+    }
+    return { width, height };
 }
 
 function addUserNode(userName) {
@@ -367,25 +402,25 @@ function addQueueOrderControls(parent, queueLength, i) {
     const toTop = document.createElement("button");
     toTop.innerText = "⇈";
     toTop.title = "Move to top";
-    toTop.disabled = (i === 0);
+    toTop.disabled = i === 0;
     toTop.addEventListener("click", () => reorderQueue(i, 0));
 
     const up = document.createElement("button");
     up.innerText = "↑";
     up.title = "Move up";
-    up.disabled = (i === 0);
+    up.disabled = i === 0;
     up.addEventListener("click", () => reorderQueue(i, i - 1));
 
     const down = document.createElement("button");
     down.innerText = "↓";
     down.title = "Move down";
-    down.disabled = (i === queueLength - 1);
+    down.disabled = i === queueLength - 1;
     down.addEventListener("click", () => reorderQueue(i, i + 1));
 
     const toBottom = document.createElement("button");
     toBottom.innerText = "⇊";
     toBottom.title = "Move to bottom";
-    toBottom.disabled = (i === queueLength - 1);
+    toBottom.disabled = i === queueLength - 1;
     toBottom.addEventListener("click", () => reorderQueue(i, queueLength - 1));
 
     const remove = document.createElement("button");
@@ -394,11 +429,11 @@ function addQueueOrderControls(parent, queueLength, i) {
     remove.classList.add("destructive");
     remove.addEventListener("click", () => removeFromQueue(i));
 
-    controls.appendChild(toTop)
+    controls.appendChild(toTop);
     controls.appendChild(up);
     controls.appendChild(down);
-    controls.appendChild(toBottom)
-    controls.appendChild(remove)
+    controls.appendChild(toBottom);
+    controls.appendChild(remove);
 
     parent.appendChild(controls);
 }
