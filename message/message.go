@@ -9,17 +9,18 @@ import (
 type MessageType string
 
 const (
-	Init         MessageType = "init"
-	Play         MessageType = "play"
-	Pause        MessageType = "pause"
-	Load         MessageType = "load"
-	QueueUrl     MessageType = "queueurl"
-	Introduce    MessageType = "introduce"
-	Join         MessageType = "join"
-	Leave        MessageType = "leave"
-	SyncQueue    MessageType = "syncqueue"
-	SkipVideo    MessageType = "skip"
-	ReorderQueue MessageType = "reorderqueue"
+	Init            MessageType = "init"
+	Play            MessageType = "play"
+	Pause           MessageType = "pause"
+	Load            MessageType = "load"
+	QueueUrl        MessageType = "queueurl"
+	Introduce       MessageType = "introduce"
+	Join            MessageType = "join"
+	Leave           MessageType = "leave"
+	SyncQueue       MessageType = "syncqueue"
+	SkipVideo       MessageType = "skip"
+	ReorderQueue    MessageType = "reorderqueue"
+	RemoveFromQueue MessageType = "removefromqueue"
 )
 
 type Message struct {
@@ -72,6 +73,10 @@ type SkipVideoMessage struct{}
 type ReorderQueueMessage struct {
 	From int `json:"from"`
 	To   int `json:"to"`
+}
+
+type RemoveFromQueueMessage struct {
+	Index int `json:"index"`
 }
 
 func (m *Message) UnmarshalJSON(data []byte) error {
@@ -127,6 +132,12 @@ func (m *Message) UnmarshalJSON(data []byte) error {
 		m.Payload = SkipVideoMessage{}
 	case ReorderQueue:
 		var payload ReorderQueueMessage
+		if err := json.Unmarshal(temp.Payload, &payload); err != nil {
+			return err
+		}
+		m.Payload = payload
+	case RemoveFromQueue:
+		var payload RemoveFromQueueMessage
 		if err := json.Unmarshal(temp.Payload, &payload); err != nil {
 			return err
 		}

@@ -66,6 +66,8 @@ func handleRoomSocket(w http.ResponseWriter, r *http.Request) {
 			}
 		case msg.ReorderQueueMessage:
 			room.ReorderQueue(payload.From, payload.To)
+		case msg.RemoveFromQueueMessage:
+			room.RemoveFromQueue(payload.Index)
 		case msg.SkipVideoMessage:
 			room.LoadNext()
 		default:

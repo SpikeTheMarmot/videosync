@@ -102,6 +102,13 @@ function reorderQueue(from, to) {
     }));
 }
 
+function removeFromQueue(index) {
+    ws.send(JSON.stringify({
+        type: "removefromqueue",
+        payload: { index }
+    }));
+}
+
 function skipVideo() {
     ws.send(JSON.stringify({
         type: "skip",
@@ -381,10 +388,17 @@ function addQueueOrderControls(parent, queueLength, i) {
     toBottom.disabled = (i === queueLength - 1);
     toBottom.addEventListener("click", () => reorderQueue(i, queueLength - 1));
 
+    const remove = document.createElement("button");
+    remove.innerText = "⨯";
+    remove.title = "Remove from queue";
+    remove.classList.add("destructive");
+    remove.addEventListener("click", () => removeFromQueue(i));
+
     controls.appendChild(toTop)
     controls.appendChild(up);
     controls.appendChild(down);
     controls.appendChild(toBottom)
+    controls.appendChild(remove)
 
     parent.appendChild(controls);
 }

@@ -169,6 +169,14 @@ func (room *Room) ReorderQueue(from, to int) {
 	room.Send(nil, message.Message{Type: message.SyncQueue, Payload: message.SyncQueueMessage{Queue: room.queue}})
 }
 
+func (room *Room) RemoveFromQueue(index int) {
+	if index < 0 || index >= len(room.queue) {
+		return
+	}
+	room.queue = append(room.queue[:index], room.queue[index+1:]...)
+	room.Send(nil, message.Message{Type: message.SyncQueue, Payload: message.SyncQueueMessage{Queue: room.queue}})
+}
+
 func (room *Room) Lock() {
 	room.mu.Lock()
 }

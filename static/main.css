@@ -44,22 +44,29 @@ button {
         color: var(--color-base);
 
         &:hover {
-            background-color: color-mix(in srgb,
-                    var(--color-accent),
-                    var(--color-base) 10%);
+            background-color: color-mix(in srgb, var(--color-accent), var(--color-base) 10%);
         }
     }
+}
+
+button.destructive {
+    background-color: var(--color-red);
+    color: var(--color-base);
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--color-red), var(--color-base) 10%);
+    }
+}
+
+button:disabled {
+    color: var(--color-overlay-0);
+    background-color: var(--color-base);
 }
 
 .queue-video {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-}
-
-button:disabled {
-    color: var(--color-overlay-0);
-    background-color: var(--color-base);
 }
 
 .modal_background {
