@@ -1,65 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Videosync</title>
-        <link rel="stylesheet" href="/static/main.css" />
-        <script src="https://www.youtube.com/player_api"></script>
-        <script type="module" src="/static/room.js"></script>
-    </head>
 
-    <body class="dark">
-        <h1>{{.Id}}</h1>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Videosync</title>
+    <link rel="stylesheet" href="/static/main.css" />
+    <script src="https://www.youtube.com/player_api"></script>
+    <script type="module" src="/static/room.js"></script>
+</head>
 
-        <div
-            style="
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-            "
-        >
-            <div style="flex: 1 1 0">
-                <div id="player_wrapper" style="overflow: hidden; width: 100%">
-                    <div id="yt_player"></div>
-                </div>
+<body class="dark">
+    <h1>{{.Id}}</h1>
 
-                <div>
-                    <input
-                        id="video_url_input"
-                        type="text"
-                        placeholder="Paste YouTube URL"
-                        style="width: 30em"
-                    />
-                    <button id="add_to_queue_button" type="submit">
-                        Add to queue
-                    </button>
-                </div>
-                <div style="display: flex; flex-direction: row; justify-content: start; align-items: baseline;">
-                    <h2>Next up</h2>
-                    <button id="skip_button" style="margin-left: 2em">Skip current video</button>
-                </div>
-                <div id="queuewrapper">The video queue is empty.</div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="flex: 0 0 auto">
+            <div id="player_wrapper" style="overflow: hidden; width: 100%">
+                <div id="yt_player"></div>
             </div>
-            <div style="flex: 0 0 12em; margin-left: 2em; overflow: hidden">
-                <h2>Users</h2>
-                <div id="userlist"></div>
-            </div>
-        </div>
-
-        <div id="username_modal" class="modal_background">
-            <div class="modal_window">
-                <input
-                    id="username_input"
-                    type="text"
-                    placeholder="Pick a username"
-                    autofocus
-                    maxlength="25"
-                />
-                <button id="submit_username_button" type="submit">
-                    Start watching
+            <div style="display: flex;">
+                <input id="video_url_input" type="text" placeholder="Paste YouTube URL"
+                    style="flex: 1 1 auto; margin-right: 0.5em;" />
+                <button id="add_to_queue_button" type="submit">
+                    Add to queue
                 </button>
             </div>
+            <div style="display: flex; flex-direction: row; justify-content: start; align-items: baseline;">
+                <h2>Next up</h2>
+                <button id="skip_button" style="margin-left: 2em">Skip current video</button>
+            </div>
+            <div id="queuewrapper">The video queue is empty.</div>
         </div>
-    </body>
+        <div style="flex: 0 0 12em; margin: 0 2em; overflow: hidden">
+            <h2>Users</h2>
+            <div id="userlist"></div>
+        </div>
+    </div>
+
+    <div id="username_modal" class="modal_background">
+        <div class="modal_window">
+            <input id="username_input" type="text" placeholder="Pick a username" autofocus maxlength="25" />
+            <button id="submit_username_button" type="submit">
+                Start watching
+            </button>
+        </div>
+    </div>
+</body>
+
 </html>

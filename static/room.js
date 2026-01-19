@@ -333,12 +333,13 @@ function updatePlayerState(newState) {
  * @return {{width: number; height: number;}}
  */
 function calculatePlayerSize() {
-    const playerWrapper = document.getElementById("player_wrapper");
-    let width = playerWrapper.clientWidth;
-    let height = width / (16 / 9);
-    if (height > window.innerHeight * 0.75) {
-        height = window.innerHeight * 0.75;
-        width = height * (16 / 9);
+    let clientWidth = document.documentElement.clientWidth;
+    let clientHeight = document.documentElement.clientHeight;
+    let height = clientHeight * 0.75;
+    let width = height * (16 / 9);
+    if (width > clientWidth * 0.75) {
+        width = clientWidth * 0.75;
+        height = width * (9 / 16);
     }
     return { width, height };
 }
