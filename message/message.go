@@ -21,6 +21,7 @@ const (
 	SkipVideo       MessageType = "skip"
 	ReorderQueue    MessageType = "reorderqueue"
 	RemoveFromQueue MessageType = "removefromqueue"
+	ShowToast       MessageType = "showtoast"
 )
 
 type Message struct {
@@ -77,6 +78,10 @@ type ReorderQueueMessage struct {
 
 type RemoveFromQueueMessage struct {
 	Index int `json:"index"`
+}
+
+type ShowToastMessage struct {
+	Message string `json:"message"`
 }
 
 func (m *Message) UnmarshalJSON(data []byte) error {

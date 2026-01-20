@@ -211,6 +211,8 @@ async function initPlayer(userName) {
             case "syncqueue":
                 updateQueue(payload.queue);
                 break;
+            case "showtoast":
+                showToast(payload.message);
         }
     });
 
@@ -513,4 +515,25 @@ function formatNanoseconds(ns) {
     str += minutes.toString().padStart(2, "0") + ":";
     str += seconds.toString().padStart(2, "0");
     return str;
+}
+
+function showToast(message, duration = 5000) {
+    const toastContainer = document.getElementById("toast-container");
+
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        closeToast(toast);
+    }, duration);
+}
+
+function closeToast(toast) {
+    toast.style.opacity = "0";
+    setTimeout(() => {
+        toast.remove();
+    }, 500); // Matches the CSS transition time
 }

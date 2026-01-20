@@ -194,3 +194,22 @@ button:disabled {
         border-top-right-radius: 0;
     }
 }
+
+#toast-container {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    background-color: var(--color-overlay-2);
+    color: var(--color-base);
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 0.3em;
+    font-size: 0.8em;
+    position: relative;
+    transition: opacity 0.5s ease;
+    cursor: default;
+}

@@ -69,6 +69,7 @@ func (room *Room) Join(user *User) {
 		Type:    message.Join,
 		Payload: message.JoinMessage{UserName: user.Name},
 	})
+	room.ShowToast(user.Name + " joined " + room.Id + "!")
 }
 
 func (room *Room) Leave(user *User) {
@@ -86,6 +87,7 @@ func (room *Room) Leave(user *User) {
 		Type:    message.Leave,
 		Payload: message.LeaveMessage{UserName: user.Name},
 	})
+	room.ShowToast(user.Name + " left " + room.Id + "!")
 }
 
 func (room *Room) Play(user *User, position float32) {
@@ -123,6 +125,7 @@ func (room *Room) AddToQueue(user *User, videoId string) {
 	} else {
 		room.Send(nil, message.Message{Type: message.SyncQueue, Payload: message.SyncQueueMessage{Queue: room.queue}})
 	}
+	room.ShowToast(user.Name + " queued \"" + video.Title + "\".")
 }
 
 func (room *Room) LoadNext() {
@@ -153,7 +156,7 @@ func (room *Room) Send(from *User, message message.Message) {
 	}
 }
 
-func (room *Room) ReorderQueue(from, to int) {
+func (room *Room) ReorderQueue(from, to int, user User) {
 	if from < 0 || from >= len(room.queue) || to < 0 || to > len(room.queue) || from == to {
 		return
 	}
@@ -168,14 +171,17 @@ func (room *Room) ReorderQueue(from, to int) {
 	}
 
 	room.Send(nil, message.Message{Type: message.SyncQueue, Payload: message.SyncQueueMessage{Queue: room.queue}})
+	room.ShowToast(user.Name + " reordered the queue.")
 }
 
-func (room *Room) RemoveFromQueue(index int) {
+func (room *Room) RemoveFromQueue(index int, user User) {
 	if index < 0 || index >= len(room.queue) {
 		return
 	}
+	video := room.queue[index]
 	room.queue = append(room.queue[:index], room.queue[index+1:]...)
 	room.Send(nil, message.Message{Type: message.SyncQueue, Payload: message.SyncQueueMessage{Queue: room.queue}})
+	room.ShowToast(user.Name + " removed " + video.Title + " from the queue.")
 }
 
 func (room *Room) Lock() {
@@ -184,4 +190,8 @@ func (room *Room) Lock() {
 
 func (room *Room) Unlock() {
 	room.mu.Unlock()
+}
+
+func (room *Room) ShowToast(messageText string) {
+	room.Send(nil, message.Message{Type: message.ShowToast, Payload: message.ShowToastMessage{Message: messageText}})
 }
