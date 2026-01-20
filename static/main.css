@@ -36,9 +36,11 @@ button {
     color: var(--color-text);
 
     &:hover {
-        background-color: color-mix(in srgb,
-                var(--color-surface-1),
-                var(--color-text) 10%);
+        background-color: color-mix(
+            in srgb,
+            var(--color-surface-1),
+            var(--color-text) 10%
+        );
     }
 
     &[type="submit"] {
@@ -46,9 +48,11 @@ button {
         color: var(--color-base);
 
         &:hover {
-            background-color: color-mix(in srgb,
-                    var(--color-accent),
-                    var(--color-base) 10%);
+            background-color: color-mix(
+                in srgb,
+                var(--color-accent),
+                var(--color-base) 10%
+            );
         }
     }
 }
@@ -58,9 +62,11 @@ button.destructive {
     color: var(--color-base);
 
     &:hover {
-        background-color: color-mix(in srgb,
-                var(--color-red),
-                var(--color-base) 10%);
+        background-color: color-mix(
+            in srgb,
+            var(--color-red),
+            var(--color-base) 10%
+        );
     }
 }
 
@@ -167,7 +173,7 @@ button:disabled {
     flex-direction: row;
     align-items: center;
 
-    &>div {
+    & > div {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
