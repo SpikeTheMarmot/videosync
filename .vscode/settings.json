@@ -3,9 +3,9 @@
     "prettier.tabWidth": 4,
     "prettier.singleQuote": false,
     "[javascript]": {
-        "editor.defaultFormatter": "prettier.prettier-vscode"
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[css]": {
-        "editor.defaultFormatter": "prettier.prettier-vscode"
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }
