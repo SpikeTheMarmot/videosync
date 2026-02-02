@@ -11,37 +11,56 @@
 </head>
 
 <body class="dark">
-    <h1>{{.Id}}</h1>
-
-    <div style="display: flex; flex-direction: row; justify-content: space-between;">
-        <div style="flex: 0 0 auto">
-            <div id="player_wrapper" style="overflow: hidden; width: 100%">
+    <h1 id="title">{{.Id}}</h1>
+    <div class="layout">
+        <main id="main" class="main">
+            <div id="player_wrapper" class="player-wrapper" aria-label="Video player">
                 <div id="yt_player"></div>
             </div>
-            <div style="display: flex;">
-                <input id="video_url_input" type="text" placeholder="Paste YouTube URL"
-                    style="flex: 1 1 auto; margin-right: 0.5em;" />
-                <button id="add_to_queue_button" type="submit">
+
+            <div class="video-controls">
+                <input id="video_url_input" class="video-url-input" type="text" placeholder="Paste YouTube URL" />
+                <button id="add_to_queue_button" class="btn" type="submit">
                     Add to queue
                 </button>
             </div>
-            <div style="display: flex; flex-direction: row; justify-content: start; align-items: baseline;">
-                <h2>Next up</h2>
-                <button id="skip_button" style="margin-left: 2em">Skip current video</button>
+
+            <!-- Mobile-only sidebar header: shown when sidebar can't fit beside main -->
+            <div class="mobile-sidebar-header">
+                <!-- Future "current video info panel" should go here -->
             </div>
-            <div id="queuewrapper">The video queue is empty.</div>
-        </div>
-        <div class="sidebar">
-            <button id="change_name_button">Change name</button>
-            <h2>Users</h2>
-            <div id="userlist"></div>
-        </div>
+
+            <div class="queue-header">
+                <h2>Next up</h2>
+                <button id="skip_button" class="btn skip-button">Skip current video</button>
+            </div>
+
+            <div id="queuewrapper" class="queue-wrapper">The video queue is empty.</div>
+
+            <!-- Mobile-only user list: appears below the queue on small screens -->
+            <div class="mobile-sidebar-userlist">
+                <div class="users-header">
+                    <h2>Users</h2>
+                    <button id="change_name_button_mobile" class="btn change-name">Change name</button>
+                </div>
+                <div id="userlist_mobile" class="userlist mobile-userlist"></div>
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <!-- Future "current video info panel" should go here -->
+            <div class="users-header">
+                <h2>Users</h2>
+                <button id="change_name_button" class="btn change-name">Change name</button>
+            </div>
+            <div id="userlist" class="userlist"></div>
+        </aside>
     </div>
 
     <div id="username_modal" class="modal_background">
         <div class="modal_window">
             <input id="username_input" type="text" placeholder="Pick a username" autofocus maxlength="25" />
-            <button id="submit_username_button" type="submit">
+            <button id="submit_username_button" type="submit" class="btn">
                 Start watching
             </button>
         </div>
