@@ -8,7 +8,11 @@ let syncing = false;
 /** @type HTMLElement */
 let userlist;
 /** @type HTMLElement */
+let userlistMobile;
+/** @type HTMLElement */
 let queuewrapper;
+/** @type HTMLElement */
+let playerWrapper;
 
 const youtubeApiPromise = new Promise((resolve, _reject) => {
     window.onYouTubePlayerAPIReady = () => {
@@ -35,15 +39,20 @@ init();
 async function init() {
     await pageReadyPromise;
 
+    const main = document.getElementById("main");
     const input = document.getElementById("video_url_input");
     const queueButton = document.getElementById("add_to_queue_button");
     const skipButton = document.getElementById("skip_button");
     const usernameInput = document.getElementById("username_input");
     const usernameButton = document.getElementById("submit_username_button");
     const usernameModal = document.getElementById("username_modal");
-    const playerWrapper = document.getElementById("player_wrapper");
     const changeNameButton = document.getElementById("change_name_button");
+    const changeNameButtonMobile = document.getElementById(
+        "change_name_button_mobile",
+    );
+    playerWrapper = document.getElementById("player_wrapper");
     userlist = document.getElementById("userlist");
+    userlistMobile = document.getElementById("userlist_mobile");
     queuewrapper = document.getElementById("queuewrapper");
 
     if (
@@ -54,7 +63,9 @@ async function init() {
         !(usernameButton instanceof HTMLButtonElement) ||
         !(usernameModal instanceof HTMLElement) ||
         !(playerWrapper instanceof HTMLElement) ||
-        !(changeNameButton instanceof HTMLButtonElement)
+        !(changeNameButton instanceof HTMLButtonElement) ||
+        !(userlist instanceof HTMLElement) ||
+        !(queuewrapper instanceof HTMLElement)
     ) {
         return;
     }
@@ -78,6 +89,10 @@ async function init() {
     window.addEventListener("resize", () => {
         if (player) {
             const { width, height } = calculatePlayerSize();
+            if (playerWrapper instanceof HTMLElement) {
+                playerWrapper.style.width = width + "px";
+                playerWrapper.style.height = height + "px";
+            }
             player.setSize(width, height);
         }
     });
@@ -113,12 +128,24 @@ async function init() {
         localStorage.removeItem("username");
         window.location.reload();
     });
+
+    if (changeNameButtonMobile instanceof HTMLButtonElement) {
+        changeNameButtonMobile.addEventListener("click", () => {
+            localStorage.removeItem("username");
+            window.location.reload();
+        });
+    }
 }
 
 async function initPlayer(userName) {
     await youtubeApiPromise;
 
     const { width: playerWidth, height: playerHeight } = calculatePlayerSize();
+
+    if (playerWrapper instanceof HTMLElement) {
+        playerWrapper.style.width = playerWidth + "px";
+        playerWrapper.style.height = playerHeight + "px";
+    }
 
     player = await createPlayer(playerWidth, playerHeight, {
         onStateChange: (event) => {
@@ -339,35 +366,71 @@ function updatePlayerState(newState) {
  * @return {{width: number; height: number;}}
  */
 function calculatePlayerSize() {
-    let clientWidth = document.documentElement.clientWidth;
-    let clientHeight = document.documentElement.clientHeight;
-    let height = clientHeight * 0.75;
-    let width = height * (16 / 9);
-    if (width > clientWidth * 0.75) {
-        width = clientWidth * 0.75;
-        height = width * (9 / 16);
+    const vw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const spacing = 158;
+
+    let width;
+    if (vw < 1200) {
+        width = Number.parseFloat(getComputedStyle(main).width);
+    } else {
+        width = Math.floor(Math.min(vw * 0.75, 1920));
     }
-    return { width, height };
+
+    let height = Math.round(width * (9 / 16));
+
+    const maxAllowedHeight = Math.max(0, vh - spacing);
+    if (height > maxAllowedHeight) {
+        height = Math.floor(maxAllowedHeight);
+        width = Math.floor(height * (16 / 9));
+    }
+
+    if (width > vw) {
+        width = Math.floor(vw);
+        height = Math.floor(width * (9 / 16));
+    }
+
+    return { width: Math.floor(width), height: Math.floor(height) };
 }
 
 function addUserNode(userName) {
     const el = document.createElement("div");
     el.innerText = userName;
     el.classList.add("userlist_item");
-    userlist.appendChild(el);
+    if (userlist instanceof HTMLElement) {
+        userlist.appendChild(el);
+    }
+    if (userlistMobile instanceof HTMLElement) {
+        userlistMobile.appendChild(el.cloneNode(true));
+    }
 }
 
 function removeUserNode(userName) {
-    for (const el of userlist.children) {
-        if (el.innerText === userName) {
-            el.remove();
-            break;
+    if (userlist instanceof HTMLElement) {
+        for (const el of Array.from(userlist.children)) {
+            if (el.innerText === userName) {
+                el.remove();
+                break;
+            }
+        }
+    }
+    if (userlistMobile instanceof HTMLElement) {
+        for (const el of Array.from(userlistMobile.children)) {
+            if (el.innerText === userName) {
+                el.remove();
+                break;
+            }
         }
     }
 }
 
 function initUserlist(users) {
-    userlist.innerHTML = "";
+    if (userlist instanceof HTMLElement) {
+        userlist.innerHTML = "";
+    }
+    if (userlistMobile instanceof HTMLElement) {
+        userlistMobile.innerHTML = "";
+    }
 
     for (const user of users) {
         addUserNode(user);
@@ -457,7 +520,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     controls.appendChild(c);
 
     const toTop = document.createElement("button");
-    toTop.classList.add("up-arrow");
+    toTop.classList.add("btn", "up-arrow");
     toTop.innerText = "⇈";
     toTop.title = "Move to top";
     toTop.disabled = i === 0;
@@ -465,7 +528,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     b.appendChild(toTop);
 
     const up = document.createElement("button");
-    up.classList.add("up-arrow");
+    up.classList.add("btn", "up-arrow");
     up.innerText = "↑";
     up.title = "Move up";
     up.disabled = i === 0;
@@ -473,7 +536,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     a.appendChild(up);
 
     const down = document.createElement("button");
-    down.classList.add("down-arrow");
+    down.classList.add("btn", "down-arrow");
     down.innerText = "↓";
     down.title = "Move down";
     down.disabled = i === queueLength - 1;
@@ -481,7 +544,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     a.appendChild(down);
 
     const toBottom = document.createElement("button");
-    toBottom.classList.add("down-arrow");
+    toBottom.classList.add("btn", "down-arrow");
     toBottom.innerText = "⇊";
     toBottom.title = "Move to bottom";
     toBottom.disabled = i === queueLength - 1;
@@ -491,7 +554,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     const remove = document.createElement("button");
     remove.innerText = "⨯";
     remove.title = "Remove from queue";
-    remove.classList.add("destructive");
+    remove.classList.add("btn", "destructive");
     remove.addEventListener("click", () => removeFromQueue(i));
     c.appendChild(remove);
 

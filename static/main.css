@@ -8,9 +8,78 @@ body {
     font-family: "Open Sans", sans-serif;
 }
 
-#chat_output {
-    height: 20em;
-    overflow: scroll;
+#title {
+    margin: 0 0 0 1rem;
+}
+
+.layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    gap: 1rem;
+
+    .video-controls {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+}
+
+.sidebar {
+    display: none;
+}
+
+.mobile-sidebar-header,
+.mobile-sidebar-userlist {
+    display: block;
+}
+
+.video-url-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.mobile-userlist {
+    padding: 1em;
+    background-color: var(--color-bg-1);
+    border-radius: 0.5em;
+    margin-top: 0.5em;
+}
+
+@media (min-width: 1200px) {
+    .layout {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .main {
+        margin-right: 0;
+        flex: 0 0 auto;
+        width: fit-content;
+    }
+
+    .sidebar {
+        display: block;
+        margin: 0 2em;
+        flex: 1 1 12em;
+        overflow: hidden;
+    }
+
+    .mobile-sidebar-header,
+    .mobile-sidebar-userlist {
+        display: none;
+    }
 }
 
 input[type="text"] {
@@ -55,24 +124,28 @@ button {
             );
         }
     }
-}
 
-button.destructive {
-    background-color: var(--color-red);
-    color: var(--color-base);
+    &.destructive {
+        background-color: var(--color-red);
+        color: var(--color-base);
 
-    &:hover {
-        background-color: color-mix(
-            in srgb,
-            var(--color-red),
-            var(--color-base) 10%
-        );
+        &:hover {
+            background-color: color-mix(
+                in srgb,
+                var(--color-red),
+                var(--color-base) 10%
+            );
+        }
+    }
+
+    &:disabled {
+        color: var(--color-overlay-0);
+        background-color: var(--color-base);
     }
 }
 
-button:disabled {
-    color: var(--color-overlay-0);
-    background-color: var(--color-base);
+#yt_player {
+    border-radius: 12px;
 }
 
 .modal_background {
@@ -95,6 +168,7 @@ button:disabled {
 }
 
 #userlist {
+    margin-top: 1rem;
     padding: 1em;
     background-color: var(--color-bg-1);
     border-radius: 0.5em;
@@ -193,10 +267,4 @@ button:disabled {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
     }
-}
-
-.sidebar {
-    flex: 0 0 12em;
-    margin: 0 2em;
-    overflow: hidden;
 }
