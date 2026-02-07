@@ -1,3 +1,4 @@
+const NO_VIDEO_PLAYING_MESSAGE = "No video is currently playing.";
 const roomId = getRoomId();
 
 let player;
@@ -356,6 +357,11 @@ function connectSocket() {
 }
 
 function updateCurrentVideoInfo(video) {
+    if (video.id === "") {
+        currentVideoInfoPanel.innerText = NO_VIDEO_PLAYING_MESSAGE;
+        currentVideoInfoPanelMobile.innerText = NO_VIDEO_PLAYING_MESSAGE;
+        return;
+    }
     currentVideoInfoPanel.replaceChildren(createCurrentVideoInfo(video));
     currentVideoInfoPanelMobile.replaceChildren(createCurrentVideoInfo(video));
 }
