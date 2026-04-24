@@ -58,7 +58,7 @@ func (room *Room) Join(user *User) {
 	user.Conn.WriteJSON(message.Message{
 		Type: message.Init,
 		Payload: message.InitMessage{
-			VideoId:       room.playback.Video.Id,
+			CurrentVideo:  room.playback.Video,
 			VideoPos:      room.playback.Position(),
 			PlaybackState: int(room.playback.State),
 			Users:         users,
@@ -108,7 +108,7 @@ func (room *Room) Load(video media.Video) {
 	room.playback.LatestPositionTime = time.Now()
 	room.playback.State = Paused
 
-	room.Send(nil, message.Message{Type: message.Load, Payload: message.LoadMessage{VideoId: video.Id}})
+	room.Send(nil, message.Message{Type: message.Load, Payload: message.LoadMessage{Video: video}})
 }
 
 func (room *Room) AddToQueue(user *User, videoId string) {
@@ -129,7 +129,7 @@ func (room *Room) LoadNext() {
 	if len(room.queue) == 0 {
 		if room.playback.Video.Id != "" {
 			room.playback = Playback{}
-			room.Send(nil, message.Message{Type: message.Load, Payload: message.LoadMessage{VideoId: ""}})
+			room.Send(nil, message.Message{Type: message.Load, Payload: message.LoadMessage{Video: media.Video{Id: ""}}})
 		}
 		return
 	}

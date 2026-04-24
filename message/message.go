@@ -29,7 +29,7 @@ type Message struct {
 }
 
 type InitMessage struct {
-	VideoId       string        `json:"videoId"`
+	CurrentVideo  media.Video   `json:"currentVideo"`
 	VideoPos      float32       `json:"videoPos"`
 	PlaybackState int           `json:"playbackState"`
 	Users         []string      `json:"users"`
@@ -45,7 +45,7 @@ type PauseMessage struct {
 }
 
 type LoadMessage struct {
-	VideoId string `json:"videoId"`
+	Video media.Video `json:"video"`
 }
 
 type QueueUrlMessage struct {
