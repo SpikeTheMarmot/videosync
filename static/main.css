@@ -138,6 +138,19 @@ button {
         }
     }
 
+    &.secondary {
+        background-color: var(--color-green);
+        color: var(--color-base);
+
+        &:hover {
+            background-color: color-mix(
+                in srgb,
+                var(--color-green),
+                var(--color-base) 10%
+            );
+        }
+    }
+
     &:disabled {
         color: var(--color-overlay-0);
         background-color: var(--color-base);

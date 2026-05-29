@@ -319,6 +319,15 @@ function skipVideo() {
     );
 }
 
+function swapVideo(queueIndex) {
+    ws.send(
+        JSON.stringify({
+            type: "swapvideo",
+            payload: { queueIndex },
+        }),
+    );
+}
+
 function createPlayer(width, height, events) {
     return new Promise((resolve) => {
         const player = new YT.Player("yt_player", {
@@ -512,12 +521,21 @@ function addQueueOrderControls(parent, queueLength, i) {
     const controls = document.createElement("div");
     controls.classList.add("queue-controls");
 
-    const a = document.createElement("div");
-    controls.appendChild(a);
-    const b = document.createElement("div");
-    controls.appendChild(b);
-    const c = document.createElement("div");
-    controls.appendChild(c);
+    const divPlayNow = document.createElement("div");
+    controls.appendChild(divPlayNow);
+    const divUpDown = document.createElement("div");
+    controls.appendChild(divUpDown);
+    const divTopBottom = document.createElement("div");
+    controls.appendChild(divTopBottom);
+    const divRemove = document.createElement("div");
+    controls.appendChild(divRemove);
+
+    const playNow = document.createElement("button");
+    playNow.classList.add("btn", "secondary");
+    playNow.innerText = "⯈";
+    playNow.title = "Play now (moves current video to top of queue)";
+    playNow.addEventListener("click", () => swapVideo(i));
+    divPlayNow.appendChild(playNow);
 
     const toTop = document.createElement("button");
     toTop.classList.add("btn", "up-arrow");
@@ -525,7 +543,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     toTop.title = "Move to top";
     toTop.disabled = i === 0;
     toTop.addEventListener("click", () => reorderQueue(i, 0));
-    b.appendChild(toTop);
+    divTopBottom.appendChild(toTop);
 
     const up = document.createElement("button");
     up.classList.add("btn", "up-arrow");
@@ -533,7 +551,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     up.title = "Move up";
     up.disabled = i === 0;
     up.addEventListener("click", () => reorderQueue(i, i - 1));
-    a.appendChild(up);
+    divUpDown.appendChild(up);
 
     const down = document.createElement("button");
     down.classList.add("btn", "down-arrow");
@@ -541,7 +559,7 @@ function addQueueOrderControls(parent, queueLength, i) {
     down.title = "Move down";
     down.disabled = i === queueLength - 1;
     down.addEventListener("click", () => reorderQueue(i, i + 1));
-    a.appendChild(down);
+    divUpDown.appendChild(down);
 
     const toBottom = document.createElement("button");
     toBottom.classList.add("btn", "down-arrow");
@@ -549,14 +567,14 @@ function addQueueOrderControls(parent, queueLength, i) {
     toBottom.title = "Move to bottom";
     toBottom.disabled = i === queueLength - 1;
     toBottom.addEventListener("click", () => reorderQueue(i, queueLength - 1));
-    b.appendChild(toBottom);
+    divTopBottom.appendChild(toBottom);
 
     const remove = document.createElement("button");
     remove.innerText = "⨯";
     remove.title = "Remove from queue";
     remove.classList.add("btn", "destructive");
     remove.addEventListener("click", () => removeFromQueue(i));
-    c.appendChild(remove);
+    divRemove.appendChild(remove);
 
     parent.appendChild(controls);
 }
