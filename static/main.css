@@ -265,7 +265,7 @@ button {
     color: var(--color-accent);
 }
 
-.published-at {
+.meta-inline {
     font-size: 0.8em;
     color: var(--color-subtext-0);
 }

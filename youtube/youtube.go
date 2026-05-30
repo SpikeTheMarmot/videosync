@@ -37,8 +37,9 @@ func FetchVideoInfo(videoId string) (media.Video, error) {
 		"items/id",
 		"items/snippet(publishedAt,title,channelTitle,thumbnails(medium(url)))",
 		"items/contentDetails(duration)",
+		"items/statistics(viewCount)",
 	}
-	res, err := client.Videos.List([]string{"snippet", "contentDetails"}).Fields(fields...).Id(videoId).Do()
+	res, err := client.Videos.List([]string{"snippet", "contentDetails", "statistics"}).Fields(fields...).Id(videoId).Do()
 	if err != nil {
 		return media.Video{}, err
 	}
@@ -57,6 +58,7 @@ func FetchVideoInfo(videoId string) (media.Video, error) {
 		Thumbnail:   item.Snippet.Thumbnails.Medium.Url,
 		Channel:     item.Snippet.ChannelTitle,
 		PublishedAt: item.Snippet.PublishedAt,
+		Views:       item.Statistics.ViewCount,
 	}
 	return video, nil
 }

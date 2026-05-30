@@ -9,5 +9,6 @@ type Video struct {
 	Thumbnail   string        `json:"thumbnail"`
 	Channel     string        `json:"channel"`
 	PublishedAt string        `json:"publishedAt"`
+	Views       uint64        `json:"views"`
 	QueuedBy    string        `json:"queuedBy"`
 }
