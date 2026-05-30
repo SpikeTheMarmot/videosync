@@ -232,16 +232,25 @@ button {
     border-radius: 0.3em;
 }
 
-.video-duration {
+.video-duration,
+.video-position {
     box-sizing: border-box;
     position: absolute;
     bottom: 0.1em;
-    right: 0.1em;
-    color: #dddddd;
     padding: 0.1em 0.3em;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 0.3em;
     font-size: 0.8em;
+}
+
+.video-duration {
+    color: #ddd;
+    right: 0.1em;
+}
+
+.video-position {
+    color: var(--color-accent);
+    left: 0.1em;
 }
 
 .video-info {

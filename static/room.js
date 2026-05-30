@@ -515,6 +515,13 @@ function createThumbnail(video) {
     image.classList.add("thumbnail");
     wrapper.appendChild(image);
 
+    if (video.position !== null && video.position > 1) {
+        const position = document.createElement("div");
+        position.className = "video-position";
+        position.innerText = "⯈ " + formatSeconds(video.position);
+        wrapper.appendChild(position);
+    }
+
     const duration = document.createElement("div");
     duration.classList.add("video-duration");
     duration.innerText = formatNanoseconds(video.duration);
@@ -622,6 +629,12 @@ function formatDate(date) {
 
 function formatNanoseconds(ns) {
     let seconds = ns / 1_000_000_000;
+    return formatSeconds(seconds);
+}
+
+function formatSeconds(s) {
+    // output is in mm:ss or hh:mm:ss if seconds are more than 1 hour
+    let seconds = Math.floor(s);
     const hours = Math.floor(seconds / 3600);
     seconds -= hours * 3600;
     const minutes = Math.floor(seconds / 60);
