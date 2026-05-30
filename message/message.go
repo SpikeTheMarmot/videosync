@@ -19,6 +19,7 @@ const (
 	Leave           MessageType = "leave"
 	SyncQueue       MessageType = "syncqueue"
 	SkipVideo       MessageType = "skip"
+	SwapVideo       MessageType = "swapvideo"
 	ReorderQueue    MessageType = "reorderqueue"
 	RemoveFromQueue MessageType = "removefromqueue"
 )
@@ -69,6 +70,10 @@ type SyncQueueMessage struct {
 }
 
 type SkipVideoMessage struct{}
+
+type SwapVideoMessage struct{
+	QueueIndex int `json:"queueIndex"`
+}
 
 type ReorderQueueMessage struct {
 	From int `json:"from"`
@@ -130,6 +135,12 @@ func (m *Message) UnmarshalJSON(data []byte) error {
 		m.Payload = payload
 	case SkipVideo:
 		m.Payload = SkipVideoMessage{}
+	case SwapVideo:
+		var payload SwapVideoMessage
+		if err := json.Unmarshal(temp.Payload, &payload); err != nil {
+			return err
+		}
+		m.Payload = payload
 	case ReorderQueue:
 		var payload ReorderQueueMessage
 		if err := json.Unmarshal(temp.Payload, &payload); err != nil {

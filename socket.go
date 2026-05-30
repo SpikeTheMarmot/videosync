@@ -70,6 +70,8 @@ func handleRoomSocket(w http.ResponseWriter, r *http.Request) {
 			room.RemoveFromQueue(payload.Index)
 		case msg.SkipVideoMessage:
 			room.LoadNext()
+		case msg.SwapVideoMessage:
+			room.SwapVideo(payload.QueueIndex)
 		default:
 			room.Kick(user)
 		}
