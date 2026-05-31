@@ -640,9 +640,13 @@ function formatNanoseconds(ns) {
     return str;
 }
 
+function roundTo(num, decimals) {
+    const factor = Math.pow(10, decimals);
+    return Math.round(num * factor) / factor;
+}
+
 function abbreviateViews(n) {
-    if (n >= 1_000_000)
-        return (n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1) + "M";
-    if (n >= 1_000) return (n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1) + "K";
+    if (n >= 1_000_000) return roundTo(n / 1_000_000, 1) + "M";
+    if (n >= 1_000) return roundTo(n / 1_000) + "K";
     return String(n);
 }
